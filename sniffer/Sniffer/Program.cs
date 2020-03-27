@@ -77,7 +77,7 @@ namespace Sniffer
                 device = devices[choice];
             }
 
-            // Register a cancle handler that lets us break out of our capture loop
+            // Register a cancel handler that lets us break out of our capture loop
             Console.CancelKeyPress += HandleCancelKeyPress;
 
             // Open the device for capturing
@@ -104,7 +104,6 @@ namespace Sniffer
             StringBuilder csv = new StringBuilder();
 
             int counter = 0;
-
             while (stopCapturing == false)
             {
                 counter++;
@@ -246,7 +245,7 @@ namespace Sniffer
 
             foreach (TcpReconstruction tr in connections.Values)
             {
-                tr.CalculateStatistics();
+                // tr.CalculateStatistics();
                 var newLine = String.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}",
                     tr.GetTimestampString(),
                     tr.totalPackets,
@@ -285,9 +284,10 @@ namespace Sniffer
                 tr.Close();
             }
             connections.Clear();
-
+            
             using (StreamWriter sw = new StreamWriter(datasetName))
             {
+                Console.WriteLine(datasetName);
                 sw.WriteLine(
                     "Timestamp," +
                     "Total Packets," +
