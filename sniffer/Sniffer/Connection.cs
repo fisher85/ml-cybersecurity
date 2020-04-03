@@ -59,12 +59,8 @@ namespace Sniffer
             }
         }
 
-        /// <summary>
-        /// Overrided in order to catch both sides of the connection 
-        /// with the same connection object
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        // Overrided in order to catch both sides of the connection 
+        // with the same connection object
         public override bool Equals(object obj)
         {
             if (!(obj is Connection))
@@ -79,8 +75,9 @@ namespace Sniffer
 
         public override int GetHashCode()
         {
-            return ((m_srcIp.GetHashCode() ^ m_srcPort.GetHashCode()) as object).GetHashCode() ^
+            var hashCode = ((m_srcIp.GetHashCode() ^ m_srcPort.GetHashCode()) as object).GetHashCode() ^
                 ((m_dstIp.GetHashCode() ^ m_dstPort.GetHashCode()) as object).GetHashCode();
+            return hashCode;
         }
 
         public string getFileName(string path)

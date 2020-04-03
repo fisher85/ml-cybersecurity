@@ -35,12 +35,11 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PacketDotNet, Version=0.13.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\WinPcap\SharpPcap-4.2.0\Release\PacketDotNet.dll</HintPath>
+    <Reference Include="PacketDotNet">
+      <HintPath>..\..\..\..\WinPcap\SharpPcap-4.2.0\Release\PacketDotNet.dll</HintPath>
     </Reference>
     <Reference Include="SharpPcap">
-      <HintPath>..\..\..\WinPcap\SharpPcap-4.2.0\Release\SharpPcap.dll</HintPath>
+      <HintPath>..\..\..\..\WinPcap\SharpPcap-4.2.0\Release\SharpPcap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
