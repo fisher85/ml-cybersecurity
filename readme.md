@@ -12,11 +12,11 @@ https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/a
 
 https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/python-logistic-regression-fraud-detection/python-logistic-regression-fraud-detection.ipynb
 
-### ML WAF Poisoning
+### WAF (Web Application Firewall) Poisoning
 
 https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/python-waf/machine-learning-waf.ipynb
 
-### ML IDS
+### Intrusion Detection Sytem
 
 Classifier comparison: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/python-web-attack-detection/classifier-comparison.ipynb
 
