@@ -1,4 +1,5 @@
-﻿using PacketDotNet;
+﻿using MathNet.Numerics.Statistics; // Install-Package MathNet.Numerics
+using PacketDotNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,54 +42,149 @@ namespace Sniffer
         bool incompleteTcpStream = false;
         bool closed = false;
 
-        public DateTime flowStartTime; // 7
+        public DateTime flowStartTime; // 7, G
+        public DateTime fwdStartTime;
+        public DateTime bwdStartTime;
         public DateTime flowLastSeen;
+        public DateTime fwdLastSeen;
+        public DateTime bwdLastSeen;
+        public TimeSpan duration; // 8, H
 
+        public List<long> packetSizeList = new List<long>();
         public List<long> packetSizeFwdList = new List<long>();
         public List<long> packetSizeBwdList = new List<long>();
         public List<double> flowIATList = new List<double>();
-
+        public List<double> fwdIATList = new List<double>();
+        public List<double> bwdIATList = new List<double>();
+        
         // [Kahram 2018, Appendix A]
         public long totalPackets = 0;
-        public long totalFwdPackets = 0; // 9
-        public long totalBwdPackets = 0; // 10
-        public long totalLengthOfFwdPackets = 0; // 11
-        public long totalLengthOfBwdPackets = 0; // 12
-        public long fwdPacketLengthMax = 0; // 13
-        
+        public long totalFwdPackets = 0; // 9, I
+        public long totalBwdPackets = 0; // 10, J
+        public long totalLengthOfFwdPackets = 0; // 11, K
+        public long totalLengthOfBwdPackets = 0; // 12, L
+        public long fwdPacketLengthMax = 0; // 13, M
+        public long fwdPacketLengthMin = 0; // 14, N
+        public double fwdPacketLengthMean = 0; // 15, O
+        public double fwdPacketLengthStd = 0; // 16, P
+        public long bwdPacketLengthMax = 0; // 17, Q
+        public long bwdPacketLengthMin = 0; // 18, R
+        public double bwdPacketLengthMean = 0; // 19, S
+        public double bwdPacketLengthStd = 0; // 20, T
+
         // IAT = inter-arrival time, research application error [Kahram2018]
-        public double flowIATMax = 0;
+        public double flowIATMean = 0; // 23, W
+        public double flowIATStd = 0; // 24, X
+        public double flowIATMax = 0; // 25, Y
+        public double flowIATMin = 0; // 26, Z
+        public double fwdIATTotal = 0; // 27, AA
+        public double fwdIATMean = 0; // 28, AB
+        public double fwdIATStd = 0; // 29, AC
+        public double fwdIATMax = 0; // 30, AD
+        public double fwdIATMin = 0; // 31, AE
+        public double bwdIATTotal = 0; // 32, AF
+        public double bwdIATMean = 0; // 33, AG
+        public double bwdIATStd = 0; // 34, AH
+        public double bwdIATMax = 0; // 35, AI
+        public double bwdIATMin = 0; // 36, AJ
 
-        public double fwdPacketLengthMean = 0; // 15
-        public double fwdPacketLengthStd = 0; // 16
-        public long bwdPacketLengthMax = 0; // 17
+        // 37, AK, Fwd PSH Flags
+        // 38, AL, Bwd PSH Flags
+        // 39, AM, Fwd URG Flags
+        // 40, AN, Bwd URG Flags
 
-        public double bwdPacketLengthMean = 0; // 19
-        public double bwdPacketLengthStd = 0; // 20
+        public long fwdHeaderLength = 0; // 41, AO
+        public long bwdHeaderLength = 0; // 42, AP
+        // GetFwdPacketsPerSecond() // 43, AQ
+        // GetBwdPacketsPerSecond() // 44, AR
+
+        public long minPacketLength = 0; // 44, AS
+        public long maxPacketLength = 0; // 45, AT
+        public double packetLengthMean = 0; // 46, AU
+        public double packetLengthStd = 0; // 47, AV
+        public double packetLengthVariance = 0; // 48, AW
+
+        // 49, AX, FIN Flag Count
+        // 50, AY, SYN Flag Count
+        // 51, AZ, RST Flag Count
+        // 52, BA, PSH Flag Count
+        // 53, BB, ACK Flag Count
+        // 54, BC, URG Flag Count
+        // 55, BD, CWE Flag Count
+        // 56, BE, ECE Flag Count
+        // 57, BF, Down/Up Ratio
+
+        public double averagePacketSize = 0; // 58, BG
+        public double averageFwdSegmentSize = 0; // 59, BH
+        public double averageBwdSegmentSize = 0; // 60, BH
+
+        public int subflowCount = -1;
+        public double subflowStartTimeTS;
+        public double subflowLastSeenTS;
 
         public void CalculateStatistics()
         {
+            // http://www.netflowmeter.ca/netflowmeter.html
             // https://github.com/ISCX/CICFlowMeter/blob/1d4e34eee43fd2e5fc37bf37dbae0558ca7c17fe/src/main/java/cic/cs/unb/ca/jnetpcap/BasicFlow.java
+            // 
             // dumpFlowBasedFeatures()
+
+            duration = flowLastSeen - flowStartTime;
+
+            packetSizeList = packetSizeFwdList.Concat(packetSizeBwdList).ToList();
 
             if (packetSizeFwdList.Count > 0)
             {
                 fwdPacketLengthMax = packetSizeFwdList.Max();
-
-                // Standard Deviation
+                fwdPacketLengthMin = packetSizeFwdList.Min();
                 fwdPacketLengthMean = packetSizeFwdList.Average();
-                fwdPacketLengthStd = Math.Sqrt(packetSizeFwdList.Average(v => Math.Pow(v - fwdPacketLengthMean, 2)));
+                if (packetSizeFwdList.Count > 1) fwdPacketLengthStd = Statistics.StandardDeviation(packetSizeFwdList.Select(x => (double)x));
+
+                if (fwdIATList.Count > 0)
+                {
+                    fwdIATTotal = fwdIATList.Sum();
+                    fwdIATMean = fwdIATList.Average();
+                    if (fwdIATList.Count > 1) fwdIATStd = Statistics.StandardDeviation(fwdIATList.Select(x => (double)x));
+                    fwdIATMax = fwdIATList.Max();
+                    fwdIATMin = fwdIATList.Min();
+                }
+                
+                averageFwdSegmentSize = packetSizeFwdList.Average();
             }
+
             if (packetSizeBwdList.Count > 0)
             {
                 bwdPacketLengthMax = packetSizeBwdList.Max();
-
-                // Standard Deviation
+                bwdPacketLengthMin = packetSizeBwdList.Min();
                 bwdPacketLengthMean = packetSizeBwdList.Average();
-                bwdPacketLengthStd = Math.Sqrt(packetSizeBwdList.Average(v => Math.Pow(v - bwdPacketLengthMean, 2)));
+                if (packetSizeBwdList.Count > 1) bwdPacketLengthStd = Statistics.StandardDeviation(packetSizeBwdList.Select(x => (double)x));
+
+                if (bwdIATList.Count > 0)
+                {
+                    bwdIATTotal = bwdIATList.Sum();
+                    bwdIATMean = bwdIATList.Average();
+                    if (bwdIATList.Count > 1) bwdIATStd = Statistics.StandardDeviation(bwdIATList.Select(x => (double)x));
+                    bwdIATMax = bwdIATList.Max();
+                    bwdIATMin = bwdIATList.Min();
+                }
+
+                averageBwdSegmentSize = packetSizeBwdList.Average();
             }
 
-            flowIATMax = flowIATList.Max();
+            if (flowIATList.Count > 0)
+            {
+                flowIATMean = flowIATList.Average();
+                if (flowIATList.Count > 1) flowIATStd = Statistics.StandardDeviation(flowIATList.Select(x => (double)x));
+                flowIATMax = flowIATList.Max();
+                flowIATMin = flowIATList.Min();
+            }
+
+            averagePacketSize = packetSizeList.Sum() / (double)(totalFwdPackets + totalBwdPackets); 
+            minPacketLength = packetSizeList.Min();
+            maxPacketLength = packetSizeList.Max();
+            packetLengthMean = packetSizeList.Average();
+            if (packetSizeList.Count > 1) packetLengthStd = Statistics.StandardDeviation(packetSizeList.Select(x => (double)x));
+            if (packetSizeList.Count > 1) packetLengthVariance = Statistics.Variance(packetSizeList.Select(x => (double)x));
         }
 
         public TcpReconstruction(string filename)
@@ -154,16 +250,30 @@ namespace Sniffer
 
         public string GetTimestampString()
         {
-            return flowStartTime.ToString("dd.MM.yyyy HH:mm:ss");
+            TimeSpan threeHours = new TimeSpan(3, 0, 0);
+            DateTime convertedDateTime = flowStartTime.Subtract(threeHours);
+            return convertedDateTime.ToString("dd.MM.yyyy HH:mm:ss");
         }
 
         public double GetFwdPacketsPerSecond()
         {
             // Duration is in milliseconds, therefore packets per seconds = packets / (duration / 1000)
-            double duration = (flowLastSeen - flowStartTime).TotalMilliseconds;
-            if (duration > 0)
+            double durationInMilliseconds = (flowLastSeen - flowStartTime).TotalMilliseconds;
+            if (durationInMilliseconds > 0)
             {
-                return ((double)totalFwdPackets) / (duration / 1000L);
+                return ((double)totalFwdPackets) / (durationInMilliseconds / 1000L);
+            }
+            else
+                return 0;
+        }
+
+        public double GetBwdPacketsPerSecond()
+        {
+            // Duration is in milliseconds, therefore packets per seconds = packets / (duration / 1000)
+            double durationInMilliseconds = (flowLastSeen - flowStartTime).TotalMilliseconds;
+            if (durationInMilliseconds > 0)
+            {
+                return ((double)totalBwdPackets) / (durationInMilliseconds / 1000L);
             }
             else
                 return 0;
@@ -183,16 +293,29 @@ namespace Sniffer
                 return 0;
         }
 
+        public double GetPacketsPerSecond()
+        {
+            // Duration is in milliseconds, therefore bytes per seconds = bytes / (duration / 1000)
+            double duration = (flowLastSeen - flowStartTime).TotalMilliseconds;
+            if (duration > 0)
+            {
+                double res = totalFwdPackets + totalBwdPackets;
+                res = res / (duration / 1000);
+                return res;
+            }
+            else
+                return 0;
+        }
+
         public void ReassemblePacket(Packet packet, DateTime pcapTimeVal)
         {
             var ip = (PacketDotNet.IpPacket)packet.Extract(typeof(PacketDotNet.IpPacket));
             if (ip != null)
             {
                 var tcpPacket = (PacketDotNet.TcpPacket)packet.Extract(typeof(PacketDotNet.TcpPacket));
-                totalPackets++;
 
                 // If the paylod length is zero bail out
-                long length = tcpPacket.BytesHighPerformance.Length - tcpPacket.Header.Length;
+                // long length = tcpPacket.BytesHighPerformance.Length - tcpPacket.Header.Length;
                 // if (length == 0) return;
 
                 ReassembleTcp(
@@ -210,32 +333,84 @@ namespace Sniffer
                 // Update statistics
                 if (totalFwdPackets == 0 && totalBwdPackets == 0)
                 {
-                    flowStartTime = DateTime.Now;
+                    // flowStartTime = DateTime.Now;
                     flowStartTime = pcapTimeVal;
                     flowLastSeen = flowStartTime;
                 }
 
-                double duration = (double)(pcapTimeVal - flowLastSeen).TotalMilliseconds;
-                flowIATList.Add(duration);
+                double flowDuration = (double)(pcapTimeVal - flowStartTime).TotalMilliseconds * 1000;
+                if (flowDuration > 120000000) return;
 
-                flowLastSeen = DateTime.Now;
+                totalPackets++;
+
+                double duration = (double)(pcapTimeVal - flowLastSeen).TotalMilliseconds * 1000;
+                // In order not to write duration = 0 for the first packet in the session
+                if (totalFwdPackets + totalBwdPackets > 0)  flowIATList.Add(duration); 
+
+                // flowLastSeen = DateTime.Now;
                 flowLastSeen = pcapTimeVal;
+
+                // Process subflows
+                double currentTS = (pcapTimeVal.Ticks / TimeSpan.TicksPerMillisecond) * 1000;
+                if (subflowCount == -1)
+                {
+                    subflowStartTimeTS = currentTS;
+                    subflowLastSeenTS = currentTS;
+                }
+                double delta = currentTS - (subflowLastSeenTS);
+                double expr = (currentTS - (subflowLastSeenTS) / (double)1000000);
+                if ((currentTS - (subflowLastSeenTS) / (double)1000000) > 1.0)
+                {
+                    subflowCount++;
+                    subflowStartTimeTS = currentTS;
+                }
+                subflowLastSeenTS = currentTS;
+
+                // In the original research there is a peculiarity (error) in determining the length of a TCP packet 
+                // if the IP length is <46 bytes.
+                // Ethernet adds padding up to 46 bytes, and this padding counts as the length of the TCP payload
+                long length = (long)tcpPacket.PayloadData.Length;
+                if (ip.TotalLength < 46) length = 46 - ip.TotalLength;
 
                 // Forward
                 if (ip.SourceAddress.Address == sourceAddress[0] &&
                     (uint)tcpPacket.SourcePort == sourcePort[0])
                 {
+                    if (totalFwdPackets == 0)
+                    {
+                        fwdStartTime = pcapTimeVal;
+                        fwdLastSeen = fwdStartTime;
+                    } else
+                    {
+                        double fwdDuration = (double)(pcapTimeVal - fwdLastSeen).TotalMilliseconds * 1000;
+                        fwdIATList.Add(fwdDuration);
+                        fwdLastSeen = pcapTimeVal;
+                    }
+
                     totalFwdPackets++;
-                    totalLengthOfFwdPackets += (long)tcpPacket.PayloadData.Length;
-                    packetSizeFwdList.Add((long)tcpPacket.PayloadData.Length);
+                    totalLengthOfFwdPackets += length;
+                    packetSizeFwdList.Add(length);
+                    fwdHeaderLength += tcpPacket.Header.Length;
                 }
                 // Backward
                 if (ip.SourceAddress.Address == sourceAddress[1] &&
                     (uint)tcpPacket.SourcePort == sourcePort[1])
                 {
+                    if (totalBwdPackets == 0)
+                    {
+                        bwdStartTime = pcapTimeVal;
+                        bwdLastSeen = bwdStartTime;
+                    } else
+                    {
+                        double bwdDuration = (double)(pcapTimeVal - bwdLastSeen).TotalMilliseconds * 1000;
+                        bwdIATList.Add(bwdDuration);
+                        bwdLastSeen = pcapTimeVal;
+                    }
+
                     totalBwdPackets++;
-                    totalLengthOfBwdPackets += (long)tcpPacket.PayloadData.Length;
-                    packetSizeBwdList.Add((long)tcpPacket.PayloadData.Length);
+                    totalLengthOfBwdPackets += length;
+                    packetSizeBwdList.Add(length);
+                    bwdHeaderLength += tcpPacket.Header.Length;
                 }
             }
         }
