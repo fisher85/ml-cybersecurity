@@ -104,7 +104,7 @@ namespace Sniffer
         public double packetLengthStd = 0; // 47, AV
         public double packetLengthVariance = 0; // 48, AW
 
-        // 49, AX, FIN Flag Count
+        public double finFlagCount = 0; // 49, AX, FIN Flag Count
         // 50, AY, SYN Flag Count
         // 51, AZ, RST Flag Count
         // 52, BA, PSH Flag Count
@@ -412,6 +412,9 @@ namespace Sniffer
                     packetSizeBwdList.Add(length);
                     bwdHeaderLength += tcpPacket.Header.Length;
                 }
+
+                // FIN flags
+                if (tcpPacket.Fin) finFlagCount++;
             }
         }
 

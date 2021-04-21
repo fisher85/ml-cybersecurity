@@ -142,7 +142,7 @@ namespace Sniffer
 
                 // Do like CICFlowMeter
                 var tcp = (PacketDotNet.TcpPacket)packet.Extract(typeof(PacketDotNet.TcpPacket));
-                if (tcp != null && tcp.Fin && connections[c].totalPackets > 1)
+                if (tcp != null && connections[c].finFlagCount == 2 && connections[c].totalPackets > 1)
                 {
                     var ethP = ((PacketDotNet.EthernetPacket)packet);
                     
