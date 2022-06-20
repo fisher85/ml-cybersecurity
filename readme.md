@@ -16,7 +16,7 @@ https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/p
 
 https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/python-waf/machine-learning-waf.ipynb
 
-### Intrusion Detection Sytem
+### Intrusion Detection System
 
 Classifier comparison: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/python-web-attack-detection/classifier-comparison.ipynb
 
