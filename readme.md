@@ -22,4 +22,4 @@ Classifier comparison: https://colab.research.google.com/github/fisher85/ml-cybe
 
 Web attack detection: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/python-web-attack-detection/web-attack-detection.ipynb
 
-Web attack detection using CNN-BiLSTM: https://colab.research.google.com/github/a-nikolskaya/ml-cybersecurity/blob/neural-net/python-web-attack-detection/web-attack-detection-using-CNN-BiLSTM.ipynb
+Web attack detection using CNN-BiLSTM: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/neural-net/python-web-attack-detection/web-attack-detection-using-CNN-BiLSTM.ipynb
