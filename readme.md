@@ -23,3 +23,7 @@ Classifier comparison: https://colab.research.google.com/github/fisher85/ml-cybe
 Web attack detection: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/python-web-attack-detection/web-attack-detection.ipynb
 
 Web attack detection using CNN-BiLSTM: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/python-web-attack-detection/web-attack-detection-using-CNN-BiLSTM.ipynb
+
+### Adversarial Attacks
+
+Defending ML IDS against an evasion attack using adversarial training: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/adversarial-attacks/evasion-attack.ipynb
