@@ -26,4 +26,4 @@ Web attack detection using CNN-BiLSTM: https://colab.research.google.com/github/
 
 ### Adversarial Attacks
 
-Evasion attack against ML IDS: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/adversarial-attacks/evasion-attack.ipynb
+Defending ML IDS against an evasion attack using adversarial training: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/adversarial-attacks/evasion-attack.ipynb
