@@ -29,3 +29,5 @@ Web attack detection using CNN-BiLSTM: https://colab.research.google.com/github/
 Defending ML IDS against an evasion attack using adversarial training: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/adversarial-attacks/evasion-attack.ipynb
 
 Comparison of adversarial attacks: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/adversarial-attacks/comparison_of_adversarial_attacks.ipynb
+
+Iterative adversarial training with the HSJA attack and a Random Forest model using CICIDS2017 dataset: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/adversarial-attacks/iterative_adversarial_training_with_HSJA.ipynb
