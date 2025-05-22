@@ -31,3 +31,6 @@ Defending ML IDS against an evasion attack using adversarial training: https://c
 Comparison of adversarial attacks: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/adversarial-attacks/comparison_of_adversarial_attacks.ipynb
 
 Iterative adversarial training with the HSJA attack and a Random Forest model using CICIDS2017 dataset: https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/adversarial-attacks/iterative_adversarial_training_with_HSJA.ipynb
+
+Adversarial Example on MNIST (Manual Perturbation):
+https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/adversarial-attacks/MNIST_adversarial_example_manual_perturbation.ipynb
