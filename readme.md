@@ -34,3 +34,6 @@ Iterative adversarial training with the HSJA attack and a Random Forest model us
 
 Adversarial Example on MNIST (Manual Perturbation):
 https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/adversarial-attacks/MNIST_adversarial_example_manual_perturbation.ipynb
+
+FGSM Step-by-Step Attack on a Simple Neural Network:
+https://colab.research.google.com/github/fisher85/ml-cybersecurity/blob/master/adversarial-attacks/FGSM_step_by_step.ipynb
